@@ -291,6 +291,17 @@ class BelongsToAssociationsTest < ActiveRecord::TestCase
     assert client.account.new_record?
   end
 
+  def test_reloading_the_belonging_object
+    rails_core = accounts(:rails_core_account)
+
+    assert_equal "RailsCore", rails_core.firm.name
+    Company.where(id: rails_core.firm_id).update_all(name: "Core Team")
+    assert_equal "RailsCore", rails_core.firm.name
+
+    rails_core.reload_firm
+    assert_equal "Core Team", rails_core.firm.name
+  end
+
   def test_natural_assignment_to_nil
     client = Client.find(3)
     client.firm = nil
